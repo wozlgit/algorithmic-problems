@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 bool hasAllCodes(char * s, int k) {
     if(s == NULL) return false;
@@ -9,7 +10,7 @@ bool hasAllCodes(char * s, int k) {
     uint8_t binaryCodesFound[requiredBinaryCodeCount];
     uint32_t binaryCodesFoundCount, binaryNumber;
     
-    for(uint32_t i = 0; i < requiredBinaryCodeCount; i++) binaryCodesFound[i] = 0;
+    memset(binaryCodesFound, 0, sizeof(binaryCodesFound));
 
     binaryNumber = 0;
     binaryCodesFoundCount = 0;
