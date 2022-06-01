@@ -4,32 +4,31 @@
 #include <stdbool.h>
 
 bool hasAllCodes(char * s, int k) {
-    uint64_t *binaryCodesFound;
-    uint32_t binaryCodesFoundCount;
-    bool alreadyFound;
-    uint32_t strLength;
-
+    uint8_t *binaryCodesFound;
+    uint32_t binaryCodesFoundCount, strLength, binaryNumber, multiplier;
+    
     const uint32_t requiredBinaryCodeCount = 1U << k;
     
     for(strLength = 0; s[strLength] != '\0'; strLength++);
-    // s.length - k + 1 will be the number of distinct binary numbers of size k
+    // strLength - k + 1 will be the number of distinct binary numbers of size k
     // that can fit in a string of length strLength.
     if(strLength - k + 1 < requiredBinaryCodeCount) return false;
     
-    binaryCodesFound = (uint64_t *) malloc(sizeof(uint64_t) * requiredBinaryCodeCount);
+    binaryCodesFound = (uint8_t *) malloc(sizeof(uint8_t) * requiredBinaryCodeCount);
+    for(uint32_t i = 0; i < requiredBinaryCodeCount; i++) binaryCodesFound[i] = 0;
     
     // Get the initial binary number
-    uint64_t multiplier = 1;
-    binaryCodesFound[0] = 0;
+    multiplier = 1;
+    binaryNumber = 0;
     for(uint32_t i = 0; i < k; i++) {
         s[i] = s[i] - '0';
-        binaryCodesFound[0] += s[i] * multiplier;
+        binaryNumber += s[i] * multiplier;
         multiplier *= 2;
     }
+    binaryCodesFound[binaryNumber] = 1;
     //multiplier was multiplied by 2 one extra time, so we have to undo that such
     //that we can use multiplier later on.
     multiplier /= 2;
-    binaryCodesFoundCount = 1;
     // Get all the other numbers
     for(uint32_t i = k; i < strLength; i++) {
         // Convert s[i] from a character to a digit
@@ -37,19 +36,12 @@ bool hasAllCodes(char * s, int k) {
         // Perform a right bit-shift by 1 on the previous number (divide it by 2):
         // this will remove the first digit in the number and shift the multipliers of
         // all other digits by one. Then add the last digit of this number in.
-        binaryCodesFound[binaryCodesFoundCount] = (binaryCodesFound[binaryCodesFoundCount - 1] >> 1)
-                                                + s[i] * multiplier;
+        binaryNumber = (binaryNumber >> 1) + s[i] * multiplier;
         
-        alreadyFound = false;
-        // Check if this binary number has already been found, in which case set
-        // alreadyFound to true, to signal that this binary number had already been found.
-        for(uint32_t j = 0; j < binaryCodesFoundCount; j++) {
-            if(binaryCodesFound[j] == binaryCodesFound[binaryCodesFoundCount]) {
-                alreadyFound = true;
-                break;
-            }
-        }
-        if(!alreadyFound) binaryCodesFoundCount++;
+        binaryCodesFound[binaryNumber] = 1;
+    }
+    for(uint32_t i = 0; i < requiredBinaryCodeCount; i++) {
+        binaryCodesFoundCount += binaryCodesFound[i];
     }
     free(binaryCodesFound);
     if(binaryCodesFoundCount >= requiredBinaryCodeCount) return true;
