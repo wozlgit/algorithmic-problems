@@ -1,8 +1,6 @@
 #include <inttypes.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
 
 bool hasAllCodes(char * s, int k) {
     if(s == NULL) return false;
